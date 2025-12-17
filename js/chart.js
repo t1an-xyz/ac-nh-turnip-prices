@@ -25,7 +25,7 @@ const chart_options = {
   },
 };
 
-function update_chart(input_data, possibilities, labels) {
+function update_chart(input_data, possibilities, expected_values, labels) {
   let ctx = $("#chart"),
     datasets = [
       {
@@ -36,6 +36,18 @@ function update_chart(input_data, possibilities, labels) {
           );
         },
         data: input_data.slice(1),
+        fill: false,
+      },
+      {
+        label: i18next.t("output.chart.expected"),
+        get pointBorderColor() {
+          return getComputedStyle(document.documentElement).getPropertyValue(
+            "--chart-point-color"
+          );
+        },
+        data: [input_data[0], ...expected_values].map((price) =>
+          price.toFixed(2)
+        ),
         fill: false,
       },
       {

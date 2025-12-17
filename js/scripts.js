@@ -302,6 +302,7 @@ const hideChart = function () {
 };
 
 const calculateOutput = function (data, first_buy, previous_pattern) {
+  $("#decision").empty();
   if (isEmpty(data)) {
     hideChart();
     return;
@@ -327,6 +328,10 @@ const calculateOutput = function (data, first_buy, previous_pattern) {
   $(".chart-wrapper:hidden").show();
   let buy_price = parseInt(buy_input.val());
   previous_pattern_number = "";
+
+  let expected_values = new Array(
+    analyzed_possibilities[0].prices.length - 2
+  ).fill(0);
   for (let poss of analyzed_possibilities) {
     var out_line =
       "<tr><td class='table-pattern'>" +
@@ -343,8 +348,11 @@ const calculateOutput = function (data, first_buy, previous_pattern) {
       )}</td>`;
     }
     out_line += `<td>${displayPercentage(poss.probability)}</td>`;
-    for (let day of poss.prices.slice(2)) {
+    for (let [i, day] of poss.prices.slice(2).entries()) {
       let price_class = getPriceClass(style_price, day.max);
+      if (poss.pattern_number != 4) {
+        expected_values[i] += (poss.probability * (day.max + day.min)) / 2;
+      }
       if (day.min !== day.max) {
         out_line += `<td class='${price_class}'>${day.min} ${i18next.t(
           "output.to"
@@ -358,6 +366,18 @@ const calculateOutput = function (data, first_buy, previous_pattern) {
     var max_class = getPriceClass(style_price, poss.weekMax);
     out_line += `<td class='${min_class}'>${poss.weekGuaranteedMinimum}</td><td class='${max_class}'>${poss.weekMax}</td></tr>`;
     output_possibilities += out_line;
+  }
+
+  let curr_time =
+    new Date().getDay() * 2 - 2 + (new Date().getHours() >= 12 ? 1 : 0);
+  let curr_price = data[curr_time + 2];
+  let expected_maximum = 0.0;
+  let expected_argmax = 0;
+  for (let i = Math.max(curr_time + 1, 0); i < expected_values.length; i++) {
+    if (expected_values[i] > expected_maximum) {
+      expected_maximum = expected_values[i];
+      expected_argmax = i;
+    }
   }
 
   $("#output").html(output_possibilities);
@@ -377,7 +397,35 @@ const calculateOutput = function (data, first_buy, previous_pattern) {
     )
   );
 
-  update_chart(data, analyzed_possibilities, labels);
+  update_chart(data, analyzed_possibilities, expected_values, labels);
+  if (curr_price && curr_time >= 0 && curr_time < data.length - 3) {
+    $("#decision").html(
+      `
+        <h2>${i18next.t("output.sell-now-title")}</h2>
+        <p>${i18next.t(
+          expected_maximum > curr_price
+            ? "output.sell-later"
+            : "output.sell-now"
+        )}
+        ${i18next.t("output.sell-advice", [
+          expected_maximum.toFixed(0),
+          labels[expected_argmax + 1],
+        ])}</p>
+      `
+    );
+  } else if (curr_price && curr_time < 0) {
+    $("#decision").html(
+      `
+      <h2>${i18next.t("output.should-buy-title")}</h2>
+      <p>${i18next.t(
+        expected_maximum > curr_price
+          ? "output.should-buy"
+          : "output.should-not-buy"
+      )}
+      ${i18next.t("output.buy-advice", [expected_maximum.toFixed(0)])}</p>
+    `
+    );
+  }
 };
 
 const generatePermalink = function (
