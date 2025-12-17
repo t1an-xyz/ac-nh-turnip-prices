@@ -15,10 +15,7 @@ const getSellFields = function () {
 };
 
 const getFirstBuyRadios = function () {
-  return [
-    $("#first-time-radio-no")[0],
-    $("#first-time-radio-yes")[0]
-  ];
+  return [$("#first-time-radio-no")[0], $("#first-time-radio-yes")[0]];
 };
 
 const getPreviousPatternRadios = function () {
@@ -27,12 +24,12 @@ const getPreviousPatternRadios = function () {
     $("#pattern-radio-fluctuating")[0],
     $("#pattern-radio-small-spike")[0],
     $("#pattern-radio-large-spike")[0],
-    $("#pattern-radio-decreasing")[0]
+    $("#pattern-radio-decreasing")[0],
   ];
 };
 
 const getCheckedRadio = function (radio_array) {
-  return radio_array.find(radio => radio.checked === true).value;
+  return radio_array.find((radio) => radio.checked === true).value;
 };
 
 const checkRadioByValue = function (radio_array, value) {
@@ -40,7 +37,7 @@ const checkRadioByValue = function (radio_array, value) {
     return;
   }
   value = value.toString();
-  radio_array.find(radio => radio.value == value).checked = true;
+  radio_array.find((radio) => radio.value == value).checked = true;
 };
 
 const state = {
@@ -51,9 +48,9 @@ const buy_input = $("#buy");
 const sell_inputs = getSellFields();
 const first_buy_radios = getFirstBuyRadios();
 const previous_pattern_radios = getPreviousPatternRadios();
-const permalink_input = $('#permalink-input');
-const permalink_button = $('#permalink-btn');
-const snackbar = $('#snackbar');
+const permalink_input = $("#permalink-input");
+const permalink_button = $("#permalink-btn");
+const snackbar = $("#snackbar");
 
 //Functions
 const fillFields = function (prices, first_buy, previous_pattern) {
@@ -61,7 +58,7 @@ const fillFields = function (prices, first_buy, previous_pattern) {
   checkRadioByValue(previous_pattern_radios, previous_pattern);
 
   buy_input.focus();
-  buy_input.val(prices[0] || '');
+  buy_input.val(prices[0] || "");
   buy_input.blur();
   const sell_prices = prices.slice(2);
 
@@ -98,19 +95,20 @@ const initialize = function () {
 
   $("#reset").on("click", function () {
     if (window.confirm(i18next.t("prices.reset-warning"))) {
-      sell_inputs.forEach(input => input.value = '');
+      sell_inputs.forEach((input) => (input.value = ""));
       fillFields([], false, -1);
       update();
     }
   });
 
-  console.log('finished initializing');
+  console.log("finished initializing");
   state.initialized = true;
 };
 
 const updateLocalStorage = function (prices, first_buy, previous_pattern) {
   try {
-    if (prices.length !== 14) throw "The data array needs exactly 14 elements to be valid";
+    if (prices.length !== 14)
+      throw "The data array needs exactly 14 elements to be valid";
     localStorage.setItem("sell_prices", JSON.stringify(prices));
     localStorage.setItem("first_buy", JSON.stringify(first_buy));
     localStorage.setItem("previous_pattern", JSON.stringify(previous_pattern));
@@ -120,7 +118,9 @@ const updateLocalStorage = function (prices, first_buy, previous_pattern) {
 };
 
 const isEmpty = function (arr) {
-  const filtered = arr.filter(value => value !== null && value !== '' && !isNaN(value));
+  const filtered = arr.filter(
+    (value) => value !== null && value !== "" && !isNaN(value)
+  );
   return filtered.length == 0;
 };
 
@@ -134,25 +134,32 @@ const getFirstBuyStateFromQuery = function (param) {
     }
 
     firstbuy = null;
-    if (firstbuy_str == "1" || firstbuy_str == "yes" || firstbuy_str == "true") {
+    if (
+      firstbuy_str == "1" ||
+      firstbuy_str == "yes" ||
+      firstbuy_str == "true"
+    ) {
       firstbuy = true;
-    } else if (firstbuy_str == "0" || firstbuy_str == "no" || firstbuy_str == "false") {
+    } else if (
+      firstbuy_str == "0" ||
+      firstbuy_str == "no" ||
+      firstbuy_str == "false"
+    ) {
       firstbuy = false;
     }
 
     return firstbuy;
-
   } catch (e) {
     return null;
   }
 };
 
 const getFirstBuyStateFromLocalstorage = function () {
-  return JSON.parse(localStorage.getItem('first_buy'));
+  return JSON.parse(localStorage.getItem("first_buy"));
 };
 
 const getPreviousPatternStateFromLocalstorage = function () {
-  return JSON.parse(localStorage.getItem('previous_pattern'));
+  return JSON.parse(localStorage.getItem("previous_pattern"));
 };
 
 const getPreviousPatternStateFromQuery = function (param) {
@@ -177,7 +184,6 @@ const getPreviousPatternStateFromQuery = function (param) {
     }
 
     return pattern;
-
   } catch (e) {
     return null;
   }
@@ -200,7 +206,10 @@ const getPricesFromLocalstorage = function () {
 const getPricesFromQuery = function (param) {
   try {
     const params = new URLSearchParams(window.location.search.substr(1));
-    const sell_prices = params.get(param).split(".").map((x) => parseInt(x, 10));
+    const sell_prices = params
+      .get(param)
+      .split(".")
+      .map((x) => parseInt(x, 10));
 
     if (!Array.isArray(sell_prices)) {
       return null;
@@ -233,7 +242,7 @@ const getPreviousFromQuery = function () {
   return [
     getFirstBuyStateFromQuery("first"),
     getPreviousPatternStateFromQuery("pattern"),
-    prices
+    prices,
   ];
 };
 
@@ -241,10 +250,9 @@ const getPreviousFromLocalstorage = function () {
   return [
     getFirstBuyStateFromLocalstorage(),
     getPreviousPatternStateFromLocalstorage(),
-    getPricesFromLocalstorage()
+    getPricesFromLocalstorage(),
   ];
 };
-
 
 /**
  * Gets previous values. First tries to parse parameters,
@@ -257,75 +265,90 @@ const getPrevious = function () {
 
 const getSellPrices = function () {
   //Checks all sell inputs and returns an array with their values
-  return res = sell_inputs.map(function (input) {
-    return parseInt(input.value || '');
-  });
+  return (res = sell_inputs.map(function (input) {
+    return parseInt(input.value || "");
+  }));
 };
 
-const getPriceClass = function(buy_price, max) {
+const getPriceClass = function (buy_price, max) {
   const priceBrackets = [200, 30, 0, -30, -99];
   let diff = max - buy_price;
-  for(var i=0; i<priceBrackets.length; i++) {
-    if(diff >= priceBrackets[i]) {
+  for (var i = 0; i < priceBrackets.length; i++) {
+    if (diff >= priceBrackets[i]) {
       return "range" + i;
     }
   }
   return "";
 };
 
-const displayPercentage = function(fraction) {
+const displayPercentage = function (fraction) {
   if (Number.isFinite(fraction)) {
     let percent = fraction * 100;
     if (percent >= 1) {
-      return percent.toPrecision(3) + '%';
+      return percent.toPrecision(3) + "%";
     } else if (percent >= 0.01) {
-      return percent.toFixed(2) + '%';
+      return percent.toFixed(2) + "%";
     } else {
-      return '<0.01%';
+      return "<0.01%";
     }
   } else {
-    return '—';
+    return "—";
   }
 };
 
-const hideChart = function() {
+const hideChart = function () {
   $("#output").html("");
-  $(".chart-wrapper").hide()
-}
+  $(".chart-wrapper").hide();
+};
 
 const calculateOutput = function (data, first_buy, previous_pattern) {
   if (isEmpty(data)) {
-    hideChart()
+    hideChart();
     return;
   }
-  let pat_desc = {0:"fluctuating", 1:"large-spike", 2:"decreasing", 3:"small-spike", 4:"all"};
+  let pat_desc = {
+    0: "fluctuating",
+    1: "large-spike",
+    2: "decreasing",
+    3: "small-spike",
+    4: "all",
+  };
   let output_possibilities = "";
   let predictor = new Predictor(data, first_buy, previous_pattern);
   let analyzed_possibilities = predictor.analyze_possibilities();
-  if (analyzed_possibilities[0].weekGuaranteedMinimum === Number.POSITIVE_INFINITY) {
-    hideChart()
-    $(".error:hidden").show()
+  if (
+    analyzed_possibilities[0].weekGuaranteedMinimum === Number.POSITIVE_INFINITY
+  ) {
+    hideChart();
+    $(".error:hidden").show();
     return;
   }
-  $(".error:visible").hide()
-  $(".chart-wrapper:hidden").show()
+  $(".error:visible").hide();
+  $(".chart-wrapper:hidden").show();
   let buy_price = parseInt(buy_input.val());
   previous_pattern_number = "";
   for (let poss of analyzed_possibilities) {
-    var out_line = "<tr><td class='table-pattern'>" + i18next.t("patterns." + pat_desc[poss.pattern_number])  + "</td>";
+    var out_line =
+      "<tr><td class='table-pattern'>" +
+      i18next.t("patterns." + pat_desc[poss.pattern_number]) +
+      "</td>";
     const style_price = buy_price || poss.prices[0].min;
     if (previous_pattern_number != poss.pattern_number) {
       previous_pattern_number = poss.pattern_number;
-      pattern_count = analyzed_possibilities
-        .filter(val => val.pattern_number == poss.pattern_number)
-        .length;
-      out_line += `<td rowspan=${pattern_count}>${displayPercentage(poss.category_total_probability)}</td>`;
+      pattern_count = analyzed_possibilities.filter(
+        (val) => val.pattern_number == poss.pattern_number
+      ).length;
+      out_line += `<td rowspan=${pattern_count}>${displayPercentage(
+        poss.category_total_probability
+      )}</td>`;
     }
     out_line += `<td>${displayPercentage(poss.probability)}</td>`;
     for (let day of poss.prices.slice(2)) {
       let price_class = getPriceClass(style_price, day.max);
       if (day.min !== day.max) {
-        out_line += `<td class='${price_class}'>${day.min} ${i18next.t("output.to")} ${day.max}</td>`;
+        out_line += `<td class='${price_class}'>${day.min} ${i18next.t(
+          "output.to"
+        )} ${day.max}</td>`;
       } else {
         out_line += `<td class='${price_class}'>${day.min}</td>`;
       }
@@ -339,31 +362,56 @@ const calculateOutput = function (data, first_buy, previous_pattern) {
 
   $("#output").html(output_possibilities);
 
-  update_chart(data, analyzed_possibilities);
+  const labels = [i18next.t("weekdays.sunday")].concat(
+    ...[
+      i18next.t("weekdays.abr.monday"),
+      i18next.t("weekdays.abr.tuesday"),
+      i18next.t("weekdays.abr.wednesday"),
+      i18next.t("weekdays.abr.thursday"),
+      i18next.t("weekdays.abr.friday"),
+      i18next.t("weekdays.abr.saturday"),
+    ].map((day) =>
+      [i18next.t("times.morning"), i18next.t("times.afternoon")].map(
+        (time) => `${day} ${time}`
+      )
+    )
+  );
+
+  update_chart(data, analyzed_possibilities, labels);
 };
 
-const generatePermalink = function (buy_price, sell_prices, first_buy, previous_pattern) {
+const generatePermalink = function (
+  buy_price,
+  sell_prices,
+  first_buy,
+  previous_pattern
+) {
   let searchParams = new URLSearchParams();
-  let pricesParam = buy_price ? buy_price.toString() : '';
+  let pricesParam = buy_price ? buy_price.toString() : "";
 
   if (!isEmpty(sell_prices)) {
-    const filtered = sell_prices.map(price => isNaN(price) ? '' : price).join('.');
-    pricesParam = pricesParam.concat('.', filtered);
+    const filtered = sell_prices
+      .map((price) => (isNaN(price) ? "" : price))
+      .join(".");
+    pricesParam = pricesParam.concat(".", filtered);
   }
 
   if (pricesParam) {
-    searchParams.append('prices', pricesParam);
+    searchParams.append("prices", pricesParam);
   }
 
   if (first_buy) {
-    searchParams.append('first', true);
+    searchParams.append("first", true);
   }
 
   if (previous_pattern !== -1) {
-    searchParams.append('pattern', previous_pattern);
+    searchParams.append("pattern", previous_pattern);
   }
 
-  return searchParams.toString() && window.location.origin.concat('?', searchParams.toString());
+  return (
+    searchParams.toString() &&
+    window.location.origin.concat("?", searchParams.toString())
+  );
 };
 
 const copyPermalink = function () {
@@ -373,34 +421,39 @@ const copyPermalink = function () {
   text.select();
   text.setSelectionRange(0, 99999); /* for mobile devices */
 
-  document.execCommand('copy');
+  document.execCommand("copy");
   permalink_input.hide();
 
   flashMessage(i18next.t("prices.permalink-copied"));
 };
 
-const flashMessage = function(message) {
+const flashMessage = function (message) {
   snackbar.text(message);
-  snackbar.addClass('show');
+  snackbar.addClass("show");
 
   setTimeout(function () {
-    snackbar.removeClass('show');
-    snackbar.text('');
+    snackbar.removeClass("show");
+    snackbar.text("");
   }, 3000);
 };
 
 const update = function () {
-  if(!state.initialized){
-    console.log('update function called before initial data load');
+  if (!state.initialized) {
+    console.log("update function called before initial data load");
     // calls to update before the previous data has been initialized / loaded will reset the data.
     return;
   }
   const sell_prices = getSellPrices();
   const buy_price = parseInt(buy_input.val());
-  const first_buy = getCheckedRadio(first_buy_radios) == 'true';
+  const first_buy = getCheckedRadio(first_buy_radios) == "true";
   const previous_pattern = parseInt(getCheckedRadio(previous_pattern_radios));
 
-  const permalink = generatePermalink(buy_price, sell_prices, first_buy, previous_pattern);
+  const permalink = generatePermalink(
+    buy_price,
+    sell_prices,
+    first_buy,
+    previous_pattern
+  );
   if (permalink) {
     permalink_button.show();
   } else {
